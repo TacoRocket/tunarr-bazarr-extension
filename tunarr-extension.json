@@ -1,6 +1,6 @@
 {
   "id": "bazarr",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "apiVersion": "0.5",
   "entrypoint": "adapter.js",
   "sha256": "c8e95e099802f31922d0f3e08c1256bcd29b8bec484ca8d0caf39706583d7e74",
@@ -8,6 +8,12 @@
   "description": "Check which subtitles Bazarr has for a movie, and ask Bazarr to search for the missing ones.",
   "maintainer": "TacoRocket",
   "issueTracker": "https://github.com/TacoRocket/tunarr-bazarr-extension/issues",
+  "accessGuide": {
+    "reads": "Uses your selected movie's ID to check subtitle availability in Bazarr.",
+    "changes": "Starts a subtitle search when you ask.",
+    "connectsTo": "Contacts your Bazarr server, which may contact your subtitle providers.",
+    "downloads": "Bazarr downloads any subtitles it finds."
+  },
   "settings": [
     {
       "key": "bazarrUrl",
