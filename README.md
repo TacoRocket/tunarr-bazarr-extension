@@ -4,9 +4,9 @@ Check which subtitle languages Bazarr has indexed for a movie in Tunarr. Version
 
 ## Install in the trial
 
-Run Bazarr and connect it to Radarr. Installing this adapter connects Tunarr to that existing library. For a separate Tunarr instance with the Extensions page, follow the [trial host setup](https://github.com/TacoRocket/tunarr/tree/trial/bazarr-extension-install/docker/test/extensions).
+Run Bazarr and connect it to Radarr. Installing this adapter connects Tunarr to that existing library. For a separate Tunarr instance with the Extensions page, follow the [trial host setup](https://github.com/TacoRocket/tunarr/tree/trial/extension-store/docker/test/extensions).
 
-1. Open **Settings → Extensions**. Choose **Bazarr** from the default source and click **Install**. The source currently offers version 0.4.0. [Default extension source](https://github.com/TacoRocket/tunarr-extension-source)
+1. Open **Settings → Extensions**. Choose **Bazarr** from the default source and click **Install**. The source currently offers version 0.4.0. [Tunarr extension store](https://github.com/TacoRocket/tunarr-extensions)
 2. In **Configure**, enter the **Bazarr URL** that the extension host can reach, including its port and URL base. For example, if the containers share a network and the service is named `bazarr`, use `http://bazarr:6767` or `http://bazarr:6767/subtitles` for a service mounted at `/subtitles`. Inside the extension container, `localhost` points back to that container.
 3. Choose **Test connection**. You can leave **API key** blank to try the connection. If Bazarr returns HTTP 401 or 403, copy its key from **Bazarr → Settings → General → Security**, enter it and test again. A LAN connection can still require a key. **Test connection** leaves the settings unsaved. **Cancel** discards your edits. **Save and enable** checks the connection again and stores the settings on success.
 4. Open the movie in Tunarr’s library and copy the last part of its address after `/web/media/movie/`. Paste it into **Tunarr movie program ID** and choose **Check subtitles**. The adapter matches Tunarr’s IMDb ID to a movie in Bazarr and shows its installed and missing subtitle languages. If multiple editions share that ID, the result is ambiguous. A movie with no assigned Bazarr profile has no missing-language result.
