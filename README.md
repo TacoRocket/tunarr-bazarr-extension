@@ -47,7 +47,7 @@ The extension contacts Bazarr only when you run an action. A search checks back 
 
 - **Bazarr refused the API key:** copy the key again from Bazarr → Settings → General → Security, then select **Test**.
 - **Tunarr can't find or reach Bazarr:** use an address that works from where Tunarr runs. In Docker, put both containers on one network and use Bazarr's container name.
-- **Bazarr is still searching:** Bazarr's providers can take a while. Run **Check subtitles** a minute later.
+- **Bazarr hasn't found anything yet:** its providers can take a while, so run **Check subtitles** a minute later. If nothing turns up, check Bazarr's subtitle providers; Bazarr logs "All providers are throttled" when none are available.
 
 ## Removing the extension
 

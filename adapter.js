@@ -170,7 +170,7 @@ function search(input, startedAt) {
   );
   if (found.length === 0) {
     return {
-      message: `Bazarr is still searching for ${list(before.stillMissing)} subtitles for ${movie.title}. Check again in a minute.`,
+      message: `Bazarr is searching for ${list(before.stillMissing)} subtitles for ${movie.title} but hasn't found any yet. Check again in a minute; if nothing turns up, check Bazarr's subtitle providers.`,
       tone: "info",
       details: after,
     };
@@ -192,7 +192,7 @@ function run(input) {
     case "test": {
       const { total } = readPage(0, 1);
       return {
-        message: `Bazarr is connected and knows ${count(total)} movies.`,
+        message: `Bazarr is connected and knows ${count(total)} ${total === 1 ? "movie" : "movies"}.`,
         tone: "success",
       };
     }
