@@ -1,9 +1,9 @@
 {
   "id": "bazarr",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "apiVersion": 1,
   "entrypoint": "adapter.py",
-  "sha256": "42aec2fdda7f056d95e415fb185b4f2c40b527cab7d45dbcba50b61259e7775f",
+  "sha256": "31ad69561dca25868e7e45e5fe8fa19697c774b46bdb09599d8df2422a7cd634",
   "name": "Bazarr",
   "description": "Check subtitle languages for a movie in your Bazarr library.",
   "settings": [
@@ -20,7 +20,30 @@
       "type": "secret",
       "label": "API key",
       "required": false,
-      "help": "From Bazarr Settings → General. Leave blank to test a connection without a key."
+      "help": "Leave blank to test a connection without a key."
+    }
+  ],
+  "setupHelp": "Enter the URL the extension host can use to reach Bazarr. Include its port and any configured URL base.",
+  "credentialHelp": "If Bazarr requests a key, copy the API key from Bazarr Settings → General → Security and test the connection again.",
+  "connectionTest": true,
+  "actions": [
+    {
+      "id": "lookup",
+      "label": "Check subtitles",
+      "inputs": [
+        {
+          "key": "program",
+          "type": "tunarrProgram",
+          "label": "Tunarr movie program ID",
+          "required": true
+        }
+      ],
+      "resultLabels": {
+        "status": "Status",
+        "title": "Title",
+        "installedLanguages": "Installed languages",
+        "missingLanguages": "Missing languages"
+      }
     }
   ]
 }

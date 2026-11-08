@@ -10,6 +10,8 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 PAGE_SIZE = 200
 MAX_MOVIES = 10000
 MAX_RESPONSE_BYTES = 4 * 1024 * 1024
+MAX_INPUT_BYTES = 1024 * 1024
+IMDB_ID = re.compile(r"tt[0-9]{7,12}")
 
 
 class LookupError(Exception):
@@ -19,6 +21,29 @@ class LookupError(Exception):
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+def movie_imdb_id(config):
+    if "program" not in config:
+        imdb_id = config.get("imdbId")
+        if isinstance(imdb_id, str) and IMDB_ID.fullmatch(imdb_id):
+            return imdb_id
+        raise LookupError("Provide a movie IMDb ID.")
+
+    program = config["program"]
+    if not isinstance(program, dict) or program.get("type") != "movie":
+        raise LookupError("Select a movie from the Tunarr library.")
+    identifiers = program.get("identifiers", [])
+    if not isinstance(identifiers, list):
+        raise LookupError("The Tunarr movie has an invalid identifiers list.")
+    ids = {
+        item["id"] for item in identifiers
+        if isinstance(item, dict) and item.get("type") == "imdb"
+        and isinstance(item.get("id"), str) and IMDB_ID.fullmatch(item["id"])
+    }
+    if len(ids) != 1:
+        raise LookupError("The Tunarr movie needs one exact IMDb identifier for a Bazarr lookup.")
+    return ids.pop()
 
 
 def run(config):
@@ -32,9 +57,7 @@ def run(config):
             or parsed.username is not None or parsed.password is not None
             or parsed.query or parsed.fragment):
         raise LookupError("Provide the base HTTP or HTTPS URL of the Bazarr service.")
-    imdb_id = config.get("imdbId", "")
-    if action == "lookup" and not re.fullmatch(r"tt[0-9]{7,12}", imdb_id):
-        raise LookupError("Provide a movie IMDb ID.")
+    imdb_id = movie_imdb_id(config) if action == "lookup" else None
     headers = {"Accept": "application/json"}
     if api_key:
         if not api_key.isascii() or not api_key.isprintable() or any(c.isspace() for c in api_key):
@@ -92,7 +115,10 @@ def describe(movie):
 
 def main():
     try:
-        config = json.loads(sys.stdin.buffer.read(16385))
+        data = sys.stdin.buffer.read(MAX_INPUT_BYTES + 1)
+        if len(data) > MAX_INPUT_BYTES:
+            raise LookupError("The Tunarr program exceeds the trial input limit.")
+        config = json.loads(data)
         result = run(config)
         line = json.dumps(result, ensure_ascii=True)
         if len(line) > 8192:
@@ -100,7 +126,7 @@ def main():
         print(line)
     except HTTPError as exc:
         if exc.code in (401, 403):
-            sys.exit(f"Bazarr returned HTTP {exc.code}. Enter the API key from Bazarr Settings → General.")
+            sys.exit(f"Bazarr returned HTTP {exc.code}. Enter the API key from Bazarr Settings → General → Security.")
         sys.exit(f"Bazarr returned HTTP {exc.code}.")
     except (URLError, HTTPException, TimeoutError, OSError):
         sys.exit("Cannot reach Bazarr.")
