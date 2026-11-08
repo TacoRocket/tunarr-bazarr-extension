@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "apiVersion": "0.5",
   "entrypoint": "adapter.js",
-  "sha256": "fccabe4caec732661d92c7e2597e2919a9d91533f92f6fa60eac5252285cc010",
+  "sha256": "96cbfe1a24eb628d15ef7f2bdb695ea89332d769c100904735f6f59589963c63",
   "name": "Bazarr",
   "description": "Check which subtitles Bazarr has for a movie, and ask Bazarr to search for the missing ones.",
   "maintainer": "TacoRocket",

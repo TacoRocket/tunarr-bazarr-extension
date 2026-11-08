@@ -198,9 +198,15 @@ function lookupSubtitle(input) {
   const movie = imdbId && findMovie(imdbId);
   if (!movie) return { status: "unavailable" };
 
-  const matches = (track) =>
-    track.code2 === "en" && track.hi === input.sdh && track.forced === input.forced;
-  if (movie.subtitles?.some(matches)) return { status: "available" };
+  // Bazarr also lists embedded tracks here, including the PGS track Tunarr just tried.
+  const hasMatchingSidecar = movie.subtitles?.some((track) =>
+    track.code2 === "en" &&
+    track.hi === input.sdh &&
+    track.forced === input.forced &&
+    typeof track.path === "string" &&
+    /\.(srt|ass)$/i.test(track.path),
+  );
+  if (hasMatchingSidecar) return { status: "available" };
   if (movie.profileId == null) {
     return { status: "unavailable" };
   }
