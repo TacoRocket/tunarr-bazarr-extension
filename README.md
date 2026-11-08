@@ -7,7 +7,7 @@ With automatic subtitle preparation enabled, Tunarr can also ask the extension f
 ## Prerequisites
 
 - Tunarr with **Settings → Extensions** (extension API 0.5, an early beta).
-- Bazarr, connected to Radarr.
+- A running Bazarr instance. Enable Radarr sync and confirm the movie appears in Bazarr. Assign it a language profile and enable at least one subtitle provider so Bazarr can fetch missing tracks. [Bazarr setup guide](https://wiki.bazarr.media/Getting-Started/Setup-Guide/)
 - Bazarr's API key, from Bazarr → Settings → General → Security.
 - An address Tunarr can reach: the same machine, a shared Docker network, or your LAN.
 
@@ -20,7 +20,7 @@ In Tunarr, open **Settings → Extensions**, choose **Add extension**, then **In
 | Bazarr URL | The address Tunarr uses to reach Bazarr, including the port and any URL base. For example, `http://bazarr:6767`, or `http://bazarr:6767/subtitles` if Bazarr is mounted at `/subtitles`. |
 | API key | Bazarr's API key. |
 
-Select **Test** to check the settings, then **Save**.
+Select **Test**, then **Save**. A green test means Tunarr reached Bazarr with your API key and could read its movie list. If it reports zero movies, check the Radarr sync in Bazarr. To verify downloads, try a movie with a missing subtitle in Bazarr itself.
 
 ## Actions
 
@@ -43,7 +43,6 @@ The extension asks Bazarr for the specific language and track flags Tunarr reque
 - Movies only.
 - Matching uses the movie's IMDb ID. A movie without exactly one IMDb ID can't be checked.
 - Libraries larger than 9,000 movies can't be searched.
-- A search needs a subtitle provider configured in Bazarr to produce a file.
 
 ## Troubleshooting
 

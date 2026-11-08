@@ -31,7 +31,7 @@
       "help": "In Bazarr, open Settings → General → Security."
     }
   ],
-  "setupHelp": "Enter the address Tunarr can use to reach Bazarr, and Bazarr's API key.",
+  "setupHelp": "In Bazarr, sync your movies from Radarr, assign a language profile, and enable a subtitle provider. Then enter your Bazarr address and API key here. Test checks the connection and reports how many movies Bazarr can see.",
   "connectionTest": true,
   "actions": [
     {
