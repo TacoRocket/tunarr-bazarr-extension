@@ -1,30 +1,31 @@
 {
   "id": "bazarr",
-  "version": "1.0.1",
-  "apiVersion": 2,
+  "version": "1.1.0",
+  "apiVersion": "0.5",
   "entrypoint": "adapter.js",
-  "sha256": "7cfee1d9941fab1457d7b6830be9087d6ab63bdcdecfccd21b6419494cb70c7b",
+  "sha256": "d5da29914d6f5806bacc15f423c4193c085dc29974eec1c22d459ca61c21a296",
   "name": "Bazarr",
-  "description": "Check subtitle languages for a movie in your Bazarr library.",
+  "description": "Check which subtitles Bazarr has for a movie, and ask Bazarr to search for the missing ones.",
+  "maintainer": "TacoRocket",
+  "issueTracker": "https://github.com/TacoRocket/tunarr-bazarr-extension/issues",
   "settings": [
     {
       "key": "bazarrUrl",
       "type": "url",
       "label": "Bazarr URL",
       "required": true,
-      "help": "Include the port and any URL base configured in Bazarr.",
-      "placeholder": "http://bazarr:6767"
+      "placeholder": "http://bazarr:6767",
+      "help": "Include the port and any URL base configured in Bazarr."
     },
     {
       "key": "apiKey",
       "type": "secret",
       "label": "API key",
-      "required": false,
-      "help": "Leave blank to test a connection without a key."
+      "required": true,
+      "help": "In Bazarr, open Settings → General → Security."
     }
   ],
-  "setupHelp": "Enter the URL the extension host can use to reach Bazarr. Include its port and any configured URL base.",
-  "credentialHelp": "If Bazarr requests a key, copy the API key from Bazarr Settings → General → Security and test the connection again.",
+  "setupHelp": "Enter the address Tunarr can use to reach Bazarr, and Bazarr's API key.",
   "connectionTest": true,
   "actions": [
     {
@@ -34,31 +35,61 @@
         {
           "key": "program",
           "type": "tunarrProgram",
-          "label": "Tunarr movie program ID",
+          "label": "Movie",
           "required": true
         }
       ],
       "resultLabels": {
-        "status": "Status",
-        "title": "Title",
-        "installedLanguages": "Subtitle languages found by Bazarr",
-        "missingLanguages": "Subtitle languages the Bazarr profile still needs"
+        "found": "Subtitles Bazarr has",
+        "stillMissing": "Still missing"
+      }
+    },
+    {
+      "id": "search",
+      "label": "Search for missing subtitles",
+      "inputs": [
+        {
+          "key": "program",
+          "type": "tunarrProgram",
+          "label": "Movie",
+          "required": true
+        }
+      ],
+      "resultLabels": {
+        "found": "Subtitles Bazarr has",
+        "stillMissing": "Still missing"
       }
     }
   ],
-  "reads": [
+  "requests": [
     {
       "id": "movies",
+      "method": "GET",
       "baseUrlSetting": "bazarrUrl",
       "path": "api/movies",
+      "query": [
+        "start",
+        "length",
+        "radarrid[]"
+      ],
       "credential": {
         "setting": "apiKey",
         "header": "X-API-KEY"
-      },
+      }
+    },
+    {
+      "id": "searchMissing",
+      "method": "PATCH",
+      "baseUrlSetting": "bazarrUrl",
+      "path": "api/movies",
       "query": [
-        "start",
-        "length"
-      ]
+        "radarrid",
+        "action"
+      ],
+      "credential": {
+        "setting": "apiKey",
+        "header": "X-API-KEY"
+      }
     }
   ]
 }

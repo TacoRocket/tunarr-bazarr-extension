@@ -1,27 +1,60 @@
-# Bazarr movie subtitle lookup for Tunarr
+# Bazarr
 
-Check which subtitle languages Bazarr has indexed for a movie in Tunarr. The extension also shows which languages the movie’s Bazarr profile still wants. The extension reads Bazarr’s library through its movies API. Subtitle downloads and playback stay with Bazarr and Tunarr.
+The Bazarr extension checks which subtitle languages Bazarr has for a movie in your Tunarr library, and asks Bazarr to search for the ones its language profile still needs. Bazarr saves what it finds next to the movie, where your media server picks it up.
 
-## Install
+In Tunarr's subtitle ladder, Bazarr comes third: the media server's subtitles first, then PGS, then Bazarr. A movie with no subtitles in Bazarr yet is the normal starting point.
 
-Run Bazarr and connect it to Radarr. Installing this adapter connects Tunarr to that existing library.
+## Prerequisites
 
-1. Open **Settings → Extensions**. Choose **Bazarr** from the default source and click **Install**. [Tunarr extension store](https://github.com/TacoRocket/tunarr-extensions)
-2. In **Configure**, enter the **Bazarr URL** that the extension host can reach, including its port and URL base. For example, if the containers share a network and the service is named `bazarr`, use `http://bazarr:6767` or `http://bazarr:6767/subtitles` for a service mounted at `/subtitles`. Use an address reachable from your Tunarr installation or from the separate extension host in the original trial.
-3. Choose **Test connection**. You can leave **API key** blank to try the connection. If Bazarr returns HTTP 401 or 403, copy its key from **Bazarr → Settings → General → Security**, enter it and test again. A LAN connection can still require a key. **Test connection** leaves the settings unsaved. **Cancel** discards your edits. **Save and enable** checks the connection again and stores the settings on success.
-4. Open the movie in Tunarr’s library and copy the last part of its address after `/web/media/movie/`. Paste it into **Tunarr movie program ID** and choose **Check subtitles**. The adapter matches Tunarr’s IMDb ID to a movie in Bazarr and shows its installed and missing subtitle languages. If multiple editions share that ID, the result is ambiguous. A movie with no assigned Bazarr profile has no missing-language result.
-5. Choose **Disable** to stop lookups. **Enable** uses the saved settings again.
+- Tunarr with **Settings → Extensions** (extension API 0.5, an early beta).
+- Bazarr, connected to Radarr.
+- Bazarr's API key, from Bazarr → Settings → General → Security.
+- An address Tunarr can reach: the same machine, a shared Docker network, or your LAN.
 
-If your Tunarr has no Extensions page, see the host setup instructions in the [Tunarr extension store](https://github.com/TacoRocket/tunarr-extensions#if-your-tunarr-has-no-extensions-page).
+## Configuration
 
-## Package and API
+In Tunarr, open **Settings → Extensions**, choose **Add extension**, then **Install** on Bazarr.
 
-Version 1.0.0 targets the proposed Tunarr host API v2. The store lists this package separately from the Python trial. Availability in a Tunarr release depends on the host change landing. The API v1 trial continues to use [v0.5.0](https://github.com/TacoRocket/tunarr-bazarr-extension/tree/v0.5.0).
+| Setting | Description |
+|---|---|
+| Bazarr URL | The address Tunarr uses to reach Bazarr, including the port and any URL base. For example, `http://bazarr:6767`, or `http://bazarr:6767/subtitles` if Bazarr is mounted at `/subtitles`. |
+| API key | Bazarr's API key. |
 
-The manifest names the JavaScript entrypoint, its SHA-256 digest, settings, actions and permitted reads. The host calls `run(input)`. For a lookup it supplies the movie type and external identifiers in `input.program`. The adapter requires exactly one distinct valid IMDb identifier. It reads Bazarr’s movie index in pages of 200, up to 10,000 titles. The connection test reads a single row.
+Select **Test** to check the settings, then **Save**.
 
-The adapter calls `readJson("movies", { start, length })`. The host resolves the configured Bazarr URL and supplies the optional `X-API-KEY` header. The adapter receives the JSON response. Its code never needs the key or a network client.
+## Actions
 
-A match returns the movie title and the distinct installed and missing language codes. Missing languages are null when the movie has no assigned Bazarr profile. Unmatched and ambiguous IDs have separate statuses. These results describe Bazarr’s index of the movie. The player and Tunarr handle subtitle playback.
+### Check subtitles
 
-The API v2 host can find the pinned release in [feed-v2.json](feed-v2.json). [feed.json](feed.json) continues to point to the older Python release for API v1.
+Choose a movie. The result says whether Bazarr has it, which subtitle languages it found and which ones its profile still needs.
+
+### Search for missing subtitles
+
+Choose a movie. Bazarr searches its subtitle providers for the languages its profile still needs, and the extension checks back for about 20 seconds. If Bazarr is still searching, check again in a minute.
+
+## Data updates
+
+The extension contacts Bazarr only when you run an action. A search checks back with Bazarr up to 4 times, 5 seconds apart, reading only that movie.
+
+## Known limitations
+
+- Movies only.
+- Matching uses the movie's IMDb ID. A movie without exactly one IMDb ID can't be checked.
+- Libraries larger than 9,000 movies can't be searched.
+- Tunarr doesn't ask Bazarr on its own during playback yet; run the action from Settings.
+
+## Troubleshooting
+
+- **Bazarr refused the API key:** copy the key again from Bazarr → Settings → General → Security, then select **Test**.
+- **Tunarr can't find or reach Bazarr:** use an address that works from where Tunarr runs. In Docker, put both containers on one network and use Bazarr's container name.
+- **Bazarr is still searching:** Bazarr's providers can take a while. Run **Check subtitles** a minute later.
+
+## Removing the extension
+
+In Settings → Extensions, choose the Bazarr card, then **Uninstall**. This removes the extension, its settings and its saved API key from Tunarr. Nothing changes in Bazarr.
+
+## For developers
+
+This package targets extension API 0.5. `tunarr-extension.json` declares its settings, actions and the two Bazarr requests it makes; `adapter.js` is the code. Tunarr reads updates from [feed-v0.json](feed-v0.json). Older trial hosts keep using [feed-v2.json](feed-v2.json) (API v2) and [feed.json](feed.json) (the Python trial).
+
+Report problems in this repository's [issue tracker](https://github.com/TacoRocket/tunarr-bazarr-extension/issues).
