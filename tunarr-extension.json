@@ -1,6 +1,6 @@
 {
   "id": "bazarr",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "apiVersion": "0.5",
   "entrypoint": "adapter.js",
   "sha256": "c8e95e099802f31922d0f3e08c1256bcd29b8bec484ca8d0caf39706583d7e74",
@@ -48,7 +48,8 @@
       "resultLabels": {
         "found": "Subtitles Bazarr has",
         "stillMissing": "Still missing"
-      }
+      },
+      "quick": true
     },
     {
       "id": "search",
@@ -64,7 +65,8 @@
       "resultLabels": {
         "found": "Subtitles Bazarr has",
         "stillMissing": "Still missing"
-      }
+      },
+      "quick": true
     }
   ],
   "requests": [
