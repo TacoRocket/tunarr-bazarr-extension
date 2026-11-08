@@ -1,6 +1,6 @@
 {
   "id": "bazarr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "apiVersion": 2,
   "entrypoint": "adapter.js",
   "sha256": "7cfee1d9941fab1457d7b6830be9087d6ab63bdcdecfccd21b6419494cb70c7b",
@@ -41,8 +41,8 @@
       "resultLabels": {
         "status": "Status",
         "title": "Title",
-        "installedLanguages": "Installed languages",
-        "missingLanguages": "Missing languages"
+        "installedLanguages": "Subtitle languages found by Bazarr",
+        "missingLanguages": "Subtitle languages the Bazarr profile still needs"
       }
     }
   ],
