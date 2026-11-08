@@ -1,9 +1,9 @@
 {
   "id": "bazarr",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "apiVersion": 1,
   "entrypoint": "adapter.py",
-  "sha256": "d48eb85dea11ce094553366b85ec6391918c65018dcba7a1fbe3fdf7b81f3406",
+  "sha256": "42aec2fdda7f056d95e415fb185b4f2c40b527cab7d45dbcba50b61259e7775f",
   "name": "Bazarr",
   "description": "Check subtitle languages for a movie in your Bazarr library.",
   "settings": [

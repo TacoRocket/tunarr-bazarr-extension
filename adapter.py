@@ -83,6 +83,10 @@ def describe(movie):
         "status": "matched",
         "title": movie["title"],
         "installedLanguages": languages(movie["subtitles"]),
+        "missingLanguages": (
+            languages(movie["missing_subtitles"])
+            if movie["profileId"] is not None else None
+        ),
     }
 
 
