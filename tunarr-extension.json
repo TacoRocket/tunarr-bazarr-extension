@@ -1,7 +1,7 @@
 {
   "id": "bazarr",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "apiVersion": 1,
   "entrypoint": "adapter.py",
-  "sha256": "cc8cd36c048e3cc21f9b27d74231b06ba33c704fb828355b855eb778208b4cd2"
+  "sha256": "4cb4be59c56b941e0a7917bdd385386a5fe8e0d0061c2164c7eacd1a8e88d292"
 }
