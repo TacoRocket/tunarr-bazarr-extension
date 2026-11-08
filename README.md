@@ -2,7 +2,7 @@
 
 The Bazarr extension checks which subtitle languages Bazarr has for a movie in your Tunarr library, and asks Bazarr to search for the ones its language profile still needs. Bazarr saves what it finds next to the movie, where your media server picks it up.
 
-In Tunarr's subtitle ladder, Bazarr comes third: the media server's subtitles first, then PGS, then Bazarr. A movie with no subtitles in Bazarr yet is the normal starting point.
+With automatic subtitle preparation enabled, Tunarr can also ask the extension for a specific missing movie subtitle after checking its built-in sources.
 
 ## Prerequisites
 
@@ -32,16 +32,18 @@ Choose a movie. The result says whether Bazarr has it, which subtitle languages 
 
 Choose a movie. Bazarr searches its subtitle providers for the languages its profile still needs, and the extension checks back for about 20 seconds. If Bazarr is still searching, check again in a minute.
 
-## Data updates
+## Automatic preparation
 
-The extension contacts Bazarr only when you run an action. A search checks back with Bazarr up to 4 times, 5 seconds apart, reading only that movie.
+On a Tunarr build with the `subtitleLookup` capability, enable subtitle preparation and select the subtitles your channel should use. The current preparation job looks for English text and can ask for the hearing-impaired (SDH) variant. Tunarr’s separate `all_english` preparation setting also applies.
+
+The extension asks Bazarr for the specific language and track flags Tunarr requested. It skips movies with no Bazarr language profile. The manual **Search for missing subtitles** button still follows the movie’s whole Bazarr profile. An automatic request returns as soon as Bazarr accepts it. Tunarr can use the file once the media library exposes it. Playback continues while Bazarr searches.
 
 ## Known limitations
 
 - Movies only.
 - Matching uses the movie's IMDb ID. A movie without exactly one IMDb ID can't be checked.
 - Libraries larger than 9,000 movies can't be searched.
-- Tunarr doesn't ask Bazarr on its own during playback yet; run the action from Settings.
+- A search needs a subtitle provider configured in Bazarr to produce a file.
 
 ## Troubleshooting
 
@@ -55,6 +57,6 @@ In Settings → Extensions, open the Bazarr card's details, then choose **Uninst
 
 ## For developers
 
-This package targets extension API 0.5. `tunarr-extension.json` declares its settings, actions and the two Bazarr requests it makes; `adapter.js` is the code. Tunarr reads updates from [feed-v0.json](feed-v0.json). Older trial hosts keep using [feed-v2.json](feed-v2.json) (API v2) and [feed.json](feed.json) (the Python trial).
+This package targets extension API 0.5. `tunarr-extension.json` declares its settings, actions and the Bazarr requests it can make; `adapter.js` is the code. Tunarr reads updates from [feed-v0.json](feed-v0.json). Older trial hosts keep using [feed-v2.json](feed-v2.json) (API v2) and [feed.json](feed.json) (the Python trial).
 
 Report problems in this repository's [issue tracker](https://github.com/TacoRocket/tunarr-bazarr-extension/issues).
