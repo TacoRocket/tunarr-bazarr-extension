@@ -1,16 +1,16 @@
 {
   "id": "bazarr",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "apiVersion": "0.5",
   "entrypoint": "adapter.js",
-  "sha256": "c8e95e099802f31922d0f3e08c1256bcd29b8bec484ca8d0caf39706583d7e74",
+  "sha256": "082bd88a1d539fd4c621498f6599d84b7ce110e6959bf75c27899564a957e80e",
   "name": "Bazarr",
   "description": "Check which subtitles Bazarr has for a movie, and ask Bazarr to search for the missing ones.",
   "maintainer": "TacoRocket",
   "issueTracker": "https://github.com/TacoRocket/tunarr-bazarr-extension/issues",
   "accessGuide": {
-    "reads": "Uses your selected movie's ID to check subtitle availability in Bazarr.",
-    "changes": "Starts a subtitle search when you ask.",
+    "reads": "Reads a movie’s ID and the requested subtitle language and track flags.",
+    "changes": "Requests movie subtitles during preparation or when you choose Search.",
     "connectsTo": "Contacts your Bazarr server, which may contact your subtitle providers.",
     "downloads": "Bazarr downloads any subtitles it finds."
   },
@@ -31,7 +31,7 @@
       "help": "In Bazarr, open Settings → General → Security."
     }
   ],
-  "setupHelp": "Enter the address Tunarr can use to reach Bazarr, and Bazarr's API key.",
+  "setupHelp": "In Bazarr, sync your movies from Radarr, assign a language profile, and enable a subtitle provider. Then enter your Bazarr address and API key here. Test checks the connection and reports how many movies Bazarr can see.",
   "connectionTest": true,
   "actions": [
     {
@@ -98,6 +98,25 @@
         "setting": "apiKey",
         "header": "X-API-KEY"
       }
+    },
+    {
+      "id": "searchTrack",
+      "method": "PATCH",
+      "baseUrlSetting": "bazarrUrl",
+      "path": "api/movies/subtitles",
+      "query": [
+        "radarrid",
+        "language",
+        "hi",
+        "forced"
+      ],
+      "credential": {
+        "setting": "apiKey",
+        "header": "X-API-KEY"
+      }
     }
+  ],
+  "provides": [
+    "subtitleRequest"
   ]
 }

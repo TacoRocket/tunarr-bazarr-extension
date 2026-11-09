@@ -1,8 +1,7 @@
 // Bazarr extension for Tunarr, extension API 0.5.
 //
-// Bazarr is the third rung of Tunarr's subtitle ladder: the media server's
-// subtitles first, then PGS, then Bazarr. A movie reaching Bazarr without
-// subtitles is the normal case, so "missing" is reported as information.
+// Tunarr can ask this provider for one subtitle after local preparation.
+// The manual search action follows the movie's language profile in Bazarr.
 
 const pageSize = 200;
 // Leaves room in the 50-request budget for the search and its re-checks.
@@ -18,9 +17,6 @@ function count(n) {
 }
 
 function movieImdbId(program) {
-  if (program?.type !== "movie") {
-    throw new Error("Choose a movie. This extension checks movies only.");
-  }
   const ids = new Set();
   for (const identifier of program.identifiers ?? []) {
     if (
@@ -31,12 +27,22 @@ function movieImdbId(program) {
       ids.add(identifier.id);
     }
   }
-  if (ids.size !== 1) {
+  return ids.size === 1 ? ids.values().next().value : undefined;
+}
+
+function selectedMovie(program) {
+  if (program?.type !== "movie") {
+    throw new Error("Choose a movie. This extension checks movies only.");
+  }
+  const id = movieImdbId(program);
+  if (!id) {
     throw new Error(
       "Bazarr matches movies by IMDb ID, and this movie doesn't have exactly one.",
     );
   }
-  return ids.values().next().value;
+  const { movie, reason } = findMovie(id);
+  if (reason) throw new Error(reason);
+  return movie;
 }
 
 function readPage(start, length) {
@@ -53,19 +59,19 @@ function findMovie(imdbId) {
   for (;;) {
     const { data, total } = readPage(start, pageSize);
     if (total > movieLimit) {
-      throw new Error(
-        `Bazarr's library has more than ${count(movieLimit)} movies, which this version can't search.`,
-      );
+      return {
+        reason: `Bazarr's library has more than ${count(movieLimit)} movies, which this version can't search.`,
+      };
     }
     for (const movie of data) {
       if (movie.imdbId !== imdbId) continue;
       if (match && match.radarrId !== movie.radarrId) {
-        throw new Error("Bazarr has two movies with this IMDb ID.");
+        return { reason: "Bazarr has two movies with this IMDb ID." };
       }
       match = movie;
     }
     start += data.length;
-    if (start >= total) return match;
+    if (start >= total) return { movie: match };
     if (data.length === 0) {
       throw new Error("Bazarr sent an incomplete movie list.");
     }
@@ -109,7 +115,7 @@ function noProfile(movie) {
 }
 
 function check(input) {
-  const movie = findMovie(movieImdbId(input.program));
+  const movie = selectedMovie(input.program);
   if (!movie) {
     return {
       message: "Bazarr doesn't have this movie in its library.",
@@ -133,7 +139,7 @@ function check(input) {
 }
 
 function search(input, startedAt) {
-  const movie = findMovie(movieImdbId(input.program));
+  const movie = selectedMovie(input.program);
   if (!movie) {
     return {
       message:
@@ -186,6 +192,38 @@ function search(input, startedAt) {
   };
 }
 
+function requestSubtitle(input) {
+  if (input.program?.type !== "movie" || input.language !== "eng") {
+    return { status: "unavailable" };
+  }
+  const imdbId = movieImdbId(input.program);
+  const movie = imdbId && findMovie(imdbId).movie;
+  if (!movie) return { status: "unavailable" };
+
+  // Bazarr also lists embedded tracks here, including the PGS track Tunarr just tried.
+  const hasMatchingSidecar = movie.subtitles?.some((track) =>
+    track.code2 === "en" &&
+    track.hi === input.sdh &&
+    track.forced === input.forced &&
+    typeof track.path === "string" &&
+    /\.(srt|ass)$/i.test(track.path),
+  );
+  if (hasMatchingSidecar) return { status: "available" };
+  if (movie.profileId == null) {
+    return { status: "unavailable" };
+  }
+
+  request("searchTrack", {
+    query: {
+      radarrid: movie.radarrId,
+      language: "en",
+      hi: String(input.sdh),
+      forced: String(input.forced),
+    },
+  });
+  return { status: "requested" };
+}
+
 function run(input) {
   const startedAt = Date.now();
   switch (input.action) {
@@ -196,6 +234,8 @@ function run(input) {
         tone: "success",
       };
     }
+    case "subtitle.request":
+      return requestSubtitle(input);
     case "lookup":
       return check(input);
     case "search":

@@ -2,12 +2,12 @@
 
 The Bazarr extension checks which subtitle languages Bazarr has for a movie in your Tunarr library, and asks Bazarr to search for the ones its language profile still needs. Bazarr saves what it finds next to the movie, where your media server picks it up.
 
-In Tunarr's subtitle ladder, Bazarr comes third: the media server's subtitles first, then PGS, then Bazarr. A movie with no subtitles in Bazarr yet is the normal starting point.
+With automatic subtitle preparation enabled, Tunarr can also ask the extension for a specific missing movie subtitle after checking its built-in sources.
 
 ## Prerequisites
 
 - Tunarr with **Settings → Extensions** (extension API 0.5, an early beta).
-- Bazarr, connected to Radarr.
+- A running Bazarr instance. Enable Radarr sync and confirm the movie appears in Bazarr. Assign it a language profile and enable at least one subtitle provider so Bazarr can fetch missing tracks. [Bazarr setup guide](https://wiki.bazarr.media/Getting-Started/Setup-Guide/)
 - Bazarr's API key, from Bazarr → Settings → General → Security.
 - An address Tunarr can reach: the same machine, a shared Docker network, or your LAN.
 
@@ -20,7 +20,7 @@ In Tunarr, open **Settings → Extensions**, choose **Add extension**, then **In
 | Bazarr URL | The address Tunarr uses to reach Bazarr, including the port and any URL base. For example, `http://bazarr:6767`, or `http://bazarr:6767/subtitles` if Bazarr is mounted at `/subtitles`. |
 | API key | Bazarr's API key. |
 
-Select **Test** to check the settings, then **Save**.
+Select **Test**, then **Save**. A green test means Tunarr reached Bazarr with your API key and could read its movie list. If it reports zero movies, check the Radarr sync in Bazarr. To verify downloads, try a movie with a missing subtitle in Bazarr itself.
 
 ## Actions
 
@@ -34,14 +34,19 @@ Choose a movie. Bazarr searches its subtitle providers for the languages its pro
 
 ## Data updates
 
-The extension contacts Bazarr only when you run an action. A search checks back with Bazarr up to 4 times, 5 seconds apart, reading only that movie.
+During automatic preparation, Tunarr can request one missing movie track. The adapter returns as soon as Bazarr accepts the request. After a manual **Search for missing subtitles**, the adapter checks back up to four times, five seconds apart. It stops early if the requested subtitles appear or the action is running out of time.
+
+## Automatic preparation
+
+On a Tunarr build with the `subtitleRequest` capability, enable subtitle preparation and select the subtitles your channel should use. The current preparation job looks for English text and can ask for the hearing-impaired (SDH) variant. Tunarr’s separate `all_english` preparation setting also applies.
+
+The extension asks Bazarr for the specific language and track flags Tunarr requested. It skips movies with no Bazarr language profile. If the library exceeds 9,000 movies or two Radarr movies share the requested IMDb ID, the adapter declines so Tunarr can try another provider. Tunarr can use the file once the media library exposes it. Playback continues while Bazarr searches.
 
 ## Known limitations
 
 - Movies only.
 - Matching uses the movie's IMDb ID. A movie without exactly one IMDb ID can't be checked.
 - Libraries larger than 9,000 movies can't be searched.
-- Tunarr doesn't ask Bazarr on its own during playback yet; run the action from Settings.
 
 ## Troubleshooting
 
@@ -55,6 +60,6 @@ In Settings → Extensions, open the Bazarr card's details, then choose **Uninst
 
 ## For developers
 
-This package targets extension API 0.5. `tunarr-extension.json` declares its settings, actions and the two Bazarr requests it makes; `adapter.js` is the code. Tunarr reads updates from [feed-v0.json](feed-v0.json). Older trial hosts keep using [feed-v2.json](feed-v2.json) (API v2) and [feed.json](feed.json) (the Python trial).
+This package targets extension API 0.5. `tunarr-extension.json` declares its settings, actions and the Bazarr requests it can make; `adapter.js` is the code. Tunarr reads updates from [feed-v0.json](feed-v0.json). Older trial hosts keep using [feed-v2.json](feed-v2.json) (API v2) and [feed.json](feed.json) (the Python trial).
 
 Report problems in this repository's [issue tracker](https://github.com/TacoRocket/tunarr-bazarr-extension/issues).
