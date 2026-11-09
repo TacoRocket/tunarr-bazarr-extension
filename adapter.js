@@ -30,7 +30,7 @@ function movieImdbId(program) {
   return ids.size === 1 ? ids.values().next().value : undefined;
 }
 
-function selectedMovieId(program) {
+function selectedMovie(program) {
   if (program?.type !== "movie") {
     throw new Error("Choose a movie. This extension checks movies only.");
   }
@@ -40,7 +40,9 @@ function selectedMovieId(program) {
       "Bazarr matches movies by IMDb ID, and this movie doesn't have exactly one.",
     );
   }
-  return id;
+  const { movie, reason } = findMovie(id);
+  if (reason) throw new Error(reason);
+  return movie;
 }
 
 function readPage(start, length) {
@@ -57,19 +59,19 @@ function findMovie(imdbId) {
   for (;;) {
     const { data, total } = readPage(start, pageSize);
     if (total > movieLimit) {
-      throw new Error(
-        `Bazarr's library has more than ${count(movieLimit)} movies, which this version can't search.`,
-      );
+      return {
+        reason: `Bazarr's library has more than ${count(movieLimit)} movies, which this version can't search.`,
+      };
     }
     for (const movie of data) {
       if (movie.imdbId !== imdbId) continue;
       if (match && match.radarrId !== movie.radarrId) {
-        throw new Error("Bazarr has two movies with this IMDb ID.");
+        return { reason: "Bazarr has two movies with this IMDb ID." };
       }
       match = movie;
     }
     start += data.length;
-    if (start >= total) return match;
+    if (start >= total) return { movie: match };
     if (data.length === 0) {
       throw new Error("Bazarr sent an incomplete movie list.");
     }
@@ -113,7 +115,7 @@ function noProfile(movie) {
 }
 
 function check(input) {
-  const movie = findMovie(selectedMovieId(input.program));
+  const movie = selectedMovie(input.program);
   if (!movie) {
     return {
       message: "Bazarr doesn't have this movie in its library.",
@@ -137,7 +139,7 @@ function check(input) {
 }
 
 function search(input, startedAt) {
-  const movie = findMovie(selectedMovieId(input.program));
+  const movie = selectedMovie(input.program);
   if (!movie) {
     return {
       message:
@@ -195,7 +197,7 @@ function requestSubtitle(input) {
     return { status: "unavailable" };
   }
   const imdbId = movieImdbId(input.program);
-  const movie = imdbId && findMovie(imdbId);
+  const movie = imdbId && findMovie(imdbId).movie;
   if (!movie) return { status: "unavailable" };
 
   // Bazarr also lists embedded tracks here, including the PGS track Tunarr just tried.

@@ -32,11 +32,15 @@ Choose a movie. The result says whether Bazarr has it, which subtitle languages 
 
 Choose a movie. Bazarr searches its subtitle providers for the languages its profile still needs, and the extension checks back for about 20 seconds. If Bazarr is still searching, check again in a minute.
 
+## Data updates
+
+During automatic preparation, Tunarr can request one missing movie track. The adapter returns as soon as Bazarr accepts the request. After a manual **Search for missing subtitles**, the adapter checks back up to four times, five seconds apart. It stops early if the requested subtitles appear or the action is running out of time.
+
 ## Automatic preparation
 
 On a Tunarr build with the `subtitleRequest` capability, enable subtitle preparation and select the subtitles your channel should use. The current preparation job looks for English text and can ask for the hearing-impaired (SDH) variant. Tunarr’s separate `all_english` preparation setting also applies.
 
-The extension asks Bazarr for the specific language and track flags Tunarr requested. It skips movies with no Bazarr language profile. The manual **Search for missing subtitles** button still follows the movie’s whole Bazarr profile. An automatic request returns as soon as Bazarr accepts it. Tunarr can use the file once the media library exposes it. Playback continues while Bazarr searches.
+The extension asks Bazarr for the specific language and track flags Tunarr requested. It skips movies with no Bazarr language profile. If the library exceeds 9,000 movies or two Radarr movies share the requested IMDb ID, the adapter declines so Tunarr can try another provider. Tunarr can use the file once the media library exposes it. Playback continues while Bazarr searches.
 
 ## Known limitations
 
