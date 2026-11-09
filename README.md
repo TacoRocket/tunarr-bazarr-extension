@@ -34,7 +34,7 @@ Choose a movie. Bazarr searches its subtitle providers for the languages its pro
 
 ## Automatic preparation
 
-On a Tunarr build with the `subtitleLookup` capability, enable subtitle preparation and select the subtitles your channel should use. The current preparation job looks for English text and can ask for the hearing-impaired (SDH) variant. Tunarr’s separate `all_english` preparation setting also applies.
+On a Tunarr build with the `subtitleRequest` capability, enable subtitle preparation and select the subtitles your channel should use. The current preparation job looks for English text and can ask for the hearing-impaired (SDH) variant. Tunarr’s separate `all_english` preparation setting also applies.
 
 The extension asks Bazarr for the specific language and track flags Tunarr requested. It skips movies with no Bazarr language profile. The manual **Search for missing subtitles** button still follows the movie’s whole Bazarr profile. An automatic request returns as soon as Bazarr accepts it. Tunarr can use the file once the media library exposes it. Playback continues while Bazarr searches.
 

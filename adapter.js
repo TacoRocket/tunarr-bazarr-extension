@@ -190,7 +190,7 @@ function search(input, startedAt) {
   };
 }
 
-function lookupSubtitle(input) {
+function requestSubtitle(input) {
   if (input.program?.type !== "movie" || input.language !== "eng") {
     return { status: "unavailable" };
   }
@@ -232,8 +232,8 @@ function run(input) {
         tone: "success",
       };
     }
-    case "subtitle.lookup":
-      return lookupSubtitle(input);
+    case "subtitle.request":
+      return requestSubtitle(input);
     case "lookup":
       return check(input);
     case "search":
