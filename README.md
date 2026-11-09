@@ -51,7 +51,7 @@ The extension contacts Bazarr only when you run an action. A search checks back 
 
 ## Removing the extension
 
-In Settings → Extensions, choose the Bazarr card, then **Uninstall**. This removes the extension, its settings and its saved API key from Tunarr. Nothing changes in Bazarr.
+In Settings → Extensions, open the Bazarr card's details, then choose **Uninstall** on the **Info** tab. This removes the extension, its settings and its saved API key from Tunarr. Nothing changes in Bazarr.
 
 ## For developers
 
